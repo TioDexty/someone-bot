@@ -24,20 +24,20 @@ LONG = """*@someone flavours*
 `?@someone`: the mention will be contained in a zero-width character, resulting not visible and not clickable
 
 *Command auto-deletion*
-Add a leading question mark to make the bot delete your message. Obviously, \
+Add a leading esclamation mark to make the bot delete your message. Obviously, \
 the bot needs the permission to delete messages for this to work (examples: \
 `!@someone`, `!@@someone`, `!^@someone` or `!?@someone`)
 
 *Additional text*
 If you write something after `@someone`, the bot will include it in its reply:
 ```
-you >> @someone please ban this annoying bot!!
-bot >> @durov please ban this annoying bot!!```
+you >> @someone please ban this annoying bot :(
+bot >> @durov please ban this annoying bot :(```
 
 *Aliases*
 You can set an alias in private with "`/alias your alias`".
 Aliases will replace your name/username when @someone is used. \
-Aliases are not used if a falvour is added (`^@someone`, `@@someone`...).
+Aliases are not used if a flavour is added (`^@someone`, `@@someone`...).
 Use `/alias get` to get your currently set alias
 
 *How does it work?*
