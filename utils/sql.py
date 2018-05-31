@@ -9,8 +9,7 @@ CREATE_TABLE_CHATSUSERS = """CREATE TABLE IF NOT EXISTS ChatsUsers (
     chat_id INTEGER,
     user_id INTEGER,
     last_activity DATETIME,
-    PRIMARY KEY (chat_id, user_id),
-    FOREIGN KEY(user_id) REFERENCES Users(user_id)
+    PRIMARY KEY (chat_id, user_id)
 );"""
 
 INSERT_USER = """INSERT OR REPLACE INTO Users (user_id, first_name, username)
