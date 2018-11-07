@@ -60,8 +60,6 @@ def on_someone(bot, update, groups):
                 logger.info("can't delete message: %s", str(e))
 
 
-class module:
-    name = 'someone'
-    handlers = (
-        RegexHandler(SOMEONE_REGEX, on_someone, pass_groups=True, channel_post_updates=False),
-    )
+HANDLERS = (
+    RegexHandler(SOMEONE_REGEX, on_someone, pass_groups=True, channel_post_updates=False),
+)

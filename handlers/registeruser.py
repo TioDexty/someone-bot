@@ -34,10 +34,8 @@ def on_new_message(bot, update):
         Member.upsert(update.effective_chat.id, update.message.reply_to_message.from_user)
 
 
-class module:
-    name = 'registeruser'
-    handlers = (
-        MessageHandler(Filters.status_update.new_chat_members & ~Filters.user(user_id=updater.bot.id), on_new_member),
-        MessageHandler(Filters.status_update.left_chat_member & ~Filters.user(user_id=updater.bot.id), on_left_member),
-        MessageHandler(Filters.group, on_new_message),
-    )
+HANDLERS = (
+    MessageHandler(Filters.status_update.new_chat_members & ~Filters.user(user_id=updater.bot.id), on_new_member),
+    MessageHandler(Filters.status_update.left_chat_member & ~Filters.user(user_id=updater.bot.id), on_left_member),
+    MessageHandler(Filters.group, on_new_message),
+)

@@ -88,10 +88,8 @@ def on_short_help_button(bot, update):
                                             parse_mode=ParseMode.MARKDOWN, disable_web_page_preview=True)
 
 
-class module:
-    name = 'help'
-    handlers = (
-        CommandHandler(['start', 'help'], help_message, filters=Filters.private),
-        CallbackQueryHandler(on_extended_help_button, pattern='^extend$'),
-        CallbackQueryHandler(on_short_help_button, pattern='^reduce$'),
-    )
+HANDLERS = (
+    CommandHandler(['start', 'help'], help_message, filters=Filters.private),
+    CallbackQueryHandler(on_extended_help_button, pattern='^extend$'),
+    CallbackQueryHandler(on_short_help_button, pattern='^reduce$'),
+)

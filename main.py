@@ -12,9 +12,9 @@ def main():
     logger.info('starting...')
 
     for modname in ('help', 'someone', 'alias', 'registeruser'):
-        module = getattr(importlib.import_module(f'modules.{modname}'), 'module')
-        logger.info('module imported: %s (handlers: %d)', module.name, len(module.handlers))
-        for handler in module.handlers:
+        handlers = getattr(importlib.import_module(f'handlers.{modname}'), 'HANDLERS')
+        logger.info('module imported: %s (handlers: %d)', modname, len(handlers))
+        for handler in handlers:
             dispatcher.add_handler(handler)
 
     updater.start_polling(clean=True)

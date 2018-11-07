@@ -29,8 +29,6 @@ def on_alias_command(bot, update, args):
         update.message.reply_text('Alias set!')
 
 
-class module:
-    name = 'alias'
-    handlers = (
-        CommandHandler('alias', on_alias_command, filters=Filters.private, pass_args=True),
-    )
+HANDLERS = (
+    CommandHandler('alias', on_alias_command, filters=Filters.private, pass_args=True),
+)
