@@ -18,8 +18,7 @@ class User(peewee.Model):
     @classmethod
     def upsert(cls, user_obj):
         # upsert: http://docs.peewee-orm.com/en/latest/peewee/querying.html#upsert
-        user = cls.replace(user_id=user_obj.id, first_name=user_obj.first_name, username=user_obj.username)
-        user.save()
+        cls.replace(user_id=user_obj.id, first_name=user_obj.first_name, username=user_obj.username).execute()
 
     @classmethod
     def upsert_many(cls, users):
@@ -47,8 +46,7 @@ class Member(peewee.Model):
     @classmethod
     def upsert(cls, chat_id, user_obj):
         # upsert: http://docs.peewee-orm.com/en/latest/peewee/querying.html#upsert
-        user = cls.replace(chat_id=chat_id, user_id=user_obj.id, last_activity=datetime.datetime.now())
-        user.save()
+        cls.replace(chat_id=chat_id, user_id=user_obj.id, last_activity=datetime.datetime.now()).execute()
 
     @classmethod
     def upsert_many(cls, chat_id, users):

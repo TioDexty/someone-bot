@@ -38,7 +38,7 @@ bot >> @durov please ban this annoying bot :(```
 You can set an alias in private with "`/alias your alias`".
 Aliases will replace your name/username when @someone is used. \
 Aliases are not used if a flavour is added (`^@someone`, `@@someone`...).
-Use `/alias get` to get your currently set alias
+Use `/alias -` to delete your alias
 
 *How does it work?*
 Bots can't obtain the list of the users in a group - this implies that this bot remembers all the people \
