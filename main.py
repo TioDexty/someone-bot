@@ -1,18 +1,11 @@
 import importlib
 import logging
 
-from telegram.ext.dispatcher import run_async
-
 from bot import dispatcher
 from bot import updater
 
 logging.basicConfig(format='[%(asctime)s][%(name)s] %(message)s', level=logging.INFO)
 logger = logging.getLogger(__name__)
-
-
-@run_async
-def error_callback(bot, update, error):
-    pass
 
 
 def main():
@@ -23,8 +16,6 @@ def main():
         logger.info('module imported: %s (handlers: %d)', module.name, len(module.handlers))
         for handler in module.handlers:
             dispatcher.add_handler(handler)
-
-    dispatcher.add_error_handler(error_callback)
 
     updater.start_polling(clean=True)
     updater.idle()
