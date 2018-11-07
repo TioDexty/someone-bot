@@ -1,6 +1,9 @@
+import logging
 import datetime
 
 import peewee
+
+logger = logging.getLogger(__name__)
 
 db = peewee.SqliteDatabase('someonebot.db', pragmas={'journal_mode': 'wal'})
 
@@ -21,44 +24,55 @@ class User(peewee.Model):
         cls.replace(user_id=user_obj.id, first_name=user_obj.first_name, username=user_obj.username).execute()
 
     @classmethod
-    def upsert_many(cls, users):
-        users_list = [(user.id, user.first_name, user.username) for user in users]
-        with cls._meta.database.atomic():
-            # upsert: http://docs.peewee-orm.com/en/latest/peewee/querying.html#upsert
-            (
-                cls.insert_many(users_list, fields=(cls.user_id, cls.first_name, cls.username))
-                .on_conflict_replace()
-                .execute()
-            )
+    def upsert_and_get(cls, user_obj):
+        try:
+            return User.create(user_id=user_obj.id, first_name=user_obj.first_name, username=user_obj.username)
+        except peewee.IntegrityError:
+            user = User.get(User.user_id == user_obj.id)
+            user.first_name, user.username = user_obj.first_name, user_obj.username
+            user.save()
+            return user
 
 
 class Member(peewee.Model):
     chat_id = peewee.IntegerField()
-    user_id = peewee.ForeignKeyField(User, backref='members')
+    user = peewee.ForeignKeyField(User, backref='members')
     last_activity = peewee.DateField(default=datetime.datetime.now)
 
     class Meta:
         table_name = 'Members'
         database = db
-        primary_key = peewee.CompositeKey('chat_id', 'user_id')
+        primary_key = peewee.CompositeKey('chat_id', 'user')
         indexes = ((('chat_id', 'user_id'), True),)
 
     @classmethod
     def upsert(cls, chat_id, user_obj):
+        user = User.upsert_and_get(user_obj)
         # upsert: http://docs.peewee-orm.com/en/latest/peewee/querying.html#upsert
-        cls.replace(chat_id=chat_id, user_id=user_obj.id, last_activity=datetime.datetime.now()).execute()
+        cls.replace(chat_id=chat_id, user=user, last_activity=datetime.datetime.now()).execute()
 
     @classmethod
     def upsert_many(cls, chat_id, users):
         now = datetime.datetime.now()
-        users_list = [(chat_id, user.id, user.first_name, now) for user in users]
-        with cls._meta.database.atomic():
-            # upsert: http://docs.peewee-orm.com/en/latest/peewee/querying.html#upsert
-            (
-                cls.insert_many(users_list, fields=(cls.chat_id, cls.user_id, cls.last_activity))
-                .on_conflict_replace()
-                .execute()
-            )
+        for usert_object in users:
+            user = User.upsert_and_get(usert_object)
+            # now upsert the new member
+            cls.replace(chat_id=chat_id, user=user, last_activity=now).execute()
+
+    @classmethod
+    def get_active(cls, chat_id, days_delta=21, limit=200):
+        now = datetime.datetime.now()
+        delta = datetime.timedelta(days=days_delta)
+        active_from = now - delta
+
+        return (
+            cls
+            .select()
+            .join(User, on=(cls.user == User.user_id))
+            .where(cls.chat_id == chat_id, cls.last_activity > active_from)
+            .order_by(cls.last_activity.desc())
+            .limit(limit)
+        )
 
 
 

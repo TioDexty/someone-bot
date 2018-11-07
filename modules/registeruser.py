@@ -15,7 +15,6 @@ logger = logging.getLogger(__name__)
 def on_new_member(bot, update):
     logger.info('new members in %d: %d new members', update.message.chat.id, len(update.message.new_chat_members))
     # db.save_users(update.message.chat_id, update.message.new_chat_members)
-    User.upsert_many(update.message.new_chat_members)
     Member.upsert_many(update.effective_chat.id, update.message.new_chat_members)
 
 
@@ -30,10 +29,8 @@ def on_left_member(bot, update):
 @run_async
 def on_new_message(bot, update):
     logger.info('new message in %d from %d', update.message.chat_id, update.message.from_user.id)
-    User.upsert(update.effective_user)
     Member.upsert(update.effective_chat.id, update.effective_user)
     if update.message.reply_to_message:
-        User.upsert(update.message.reply_to_message.from_user)
         Member.upsert(update.effective_chat.id, update.message.reply_to_message.from_user)
 
 
