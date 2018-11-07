@@ -4,7 +4,7 @@ from telegram.ext import CommandHandler
 from telegram.ext import Filters
 from telegram.ext.dispatcher import run_async
 
-from utils import db
+from database import User
 
 logger = logging.getLogger(__name__)
 
@@ -15,17 +15,17 @@ def on_alias_command(bot, update, args):
 
     alias = ' '.join(args)
 
-    user_id = update.effective_message.from_user.id
+    user_id = update.effective_user.id
     if alias == '':
-        update.message.reply_markdown('You have to tell me the alias\nUse: `/alias your alias`')
+        user = User.get(User.user_id == user_id)
+        update.message.reply_markdown(user.alias or "You don't have an alias set right now, use `/alias something` "
+                                                    "to set one")
     elif alias == '-':
-        db.set_alias(user_id)
+        User.update(alias=None).where(User.user_id == user_id).execute()
         update.message.reply_text('Alias unset!')
-    elif alias == 'get':
-        alias = db.get_alias(user_id) or "You don't have an alias set right now"
-        update.message.reply_text(alias)
     else:
-        db.set_alias(user_id, alias[:161])
+        updated_rows = User.update(alias=alias[:161]).where(User.user_id == user_id).execute()
+        logger.info('updated rows: %d', updated_rows)
         update.message.reply_text('Alias set!')
 
 

@@ -4,11 +4,12 @@ import re
 from html import escape as html_escape
 
 from telegram.error import BadRequest
+from telegram.error import TelegramError
 from telegram.ext import RegexHandler
 from telegram.ext.dispatcher import run_async
 from telegram.utils.helpers import mention_html
 
-from utils import db
+from database import Member
 
 logger = logging.getLogger(__name__)
 
@@ -21,25 +22,30 @@ def on_someone(bot, update, groups):
     if msg.chat_id < 0:  # groups only
         logger.info('@someone from %d in %d', msg.from_user.id, msg.chat_id)
 
-        active_users = db.get_active_users(msg.chat_id)
+        active_users = Member.get_active(msg.chat_id)
         if not active_users:
             logger.info('no users for this chat: %d', msg.chat_id)
-            db.save_users(msg.chat_id, msg.from_user)
+            Member.upsert(msg.chat_id, msg.from_user)
             return
 
         rand_user = random.choice(active_users)
 
         if '@' in groups[0]:
-            user_mention = mention_html(rand_user[0], '@someone')
+            # mention with "@someone"
+            user_mention = mention_html(rand_user.user.user_id, '@someone')
         elif '^' in groups[0]:
-            user_mention = mention_html(*rand_user[:2])
+            # mention by first name
+            user_mention = mention_html(rand_user.user.user_id, rand_user.user.first_name)
         elif '?' in groups[0]:
-            user_mention = '<code>@someone</code>{}'.format(mention_html(rand_user[0], u'\u200B'))
+            # non-clickable mention using zero-width char
+            user_mention = '<code>@someone</code>{}'.format(mention_html(rand_user.user.user_id, u'\u200B'))
         else:
-            if rand_user[3]:  # alias
-                user_mention = mention_html(rand_user[0], rand_user[3])
+            if rand_user.user.alias:  # alias
+                # mention by alias if set
+                user_mention = mention_html(rand_user.user.user_id, rand_user.user.alias)
             else:
-                user_mention = '@' + rand_user[2] if rand_user[2] else mention_html(rand_user[:1])
+                # mention by username if present, otherwise user the first name
+                user_mention = '@' + rand_user.user.username if rand_user.user.username else mention_html(rand_user.user.user_id, rand_user.user.first_name)
 
         text = f'{user_mention} {html_escape(groups[1]) if groups[1] else ""}'
 
@@ -50,7 +56,7 @@ def on_someone(bot, update, groups):
         if msg.text.startswith('!'):
             try:
                 msg.delete()
-            except BadRequest as e:
+            except (BadRequest, TelegramError) as e:
                 logger.info("can't delete message: %s", str(e))
 
 

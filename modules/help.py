@@ -8,7 +8,7 @@ from telegram.ext import CommandHandler
 from telegram.ext import Filters
 from telegram.ext.dispatcher import run_async
 
-from utils import db
+from database import User
 
 
 SHORT = """Telegram bot inspired to [Discord's @someone April fool](https://twitter.com/discordapp/status/980159255662637056)
@@ -38,7 +38,7 @@ bot >> @durov please ban this annoying bot :(```
 You can set an alias in private with "`/alias your alias`".
 Aliases will replace your name/username when @someone is used. \
 Aliases are not used if a flavour is added (`^@someone`, `@@someone`...).
-Use `/alias get` to get your currently set alias
+Use `/alias -` to delete your alias
 
 *How does it work?*
 Bots can't obtain the list of the users in a group - this implies that this bot remembers all the people \
@@ -69,7 +69,7 @@ short_help_markup = InlineKeyboardMarkup([
 @run_async
 def help_message(bot, update):
     logger.info('/help or /start command')
-    db.save_user(update.message.from_user)
+    User.upsert(update.effective_user)
     update.message.reply_markdown(SHORT, reply_markup=extended_help_markup,
                                   disable_web_page_preview=True)
 
