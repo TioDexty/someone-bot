@@ -25,13 +25,15 @@ class User(peewee.Model):
 
     @classmethod
     def upsert_and_get(cls, user_obj):
-        try:
-            return User.create(user_id=user_obj.id, first_name=user_obj.first_name, username=user_obj.username)
-        except peewee.IntegrityError:
-            user = User.get(User.user_id == user_obj.id)
+        user, created = cls.get_or_create(
+            user_id=user_obj.id,
+            defaults={'first_name': user_obj.first_name, 'username': user_obj.username}
+        )
+        if not created:  # user was already saved: we update their metadata
             user.first_name, user.username = user_obj.first_name, user_obj.username
             user.save()
-            return user
+
+        return user
 
 
 class Member(peewee.Model):
