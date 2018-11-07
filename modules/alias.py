@@ -4,7 +4,7 @@ from telegram.ext import CommandHandler
 from telegram.ext import Filters
 from telegram.ext.dispatcher import run_async
 
-from utils import db
+# from utils import db
 
 logger = logging.getLogger(__name__)
 

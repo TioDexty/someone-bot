@@ -8,7 +8,7 @@ from telegram.ext import RegexHandler
 from telegram.ext.dispatcher import run_async
 from telegram.utils.helpers import mention_html
 
-from utils import db
+# from utils import db
 
 logger = logging.getLogger(__name__)
 

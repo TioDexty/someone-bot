@@ -8,7 +8,7 @@ from telegram.ext import CommandHandler
 from telegram.ext import Filters
 from telegram.ext.dispatcher import run_async
 
-from utils import db
+from database import User
 
 
 SHORT = """Telegram bot inspired to [Discord's @someone April fool](https://twitter.com/discordapp/status/980159255662637056)
@@ -69,7 +69,7 @@ short_help_markup = InlineKeyboardMarkup([
 @run_async
 def help_message(bot, update):
     logger.info('/help or /start command')
-    db.save_user(update.message.from_user)
+    User.upsert(update.effective_user)
     update.message.reply_markdown(SHORT, reply_markup=extended_help_markup,
                                   disable_web_page_preview=True)
 
