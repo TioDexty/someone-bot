@@ -1,4 +1,4 @@
 from telegram.ext import Updater
 
-updater = Updater(token='810948278:AAFheC44-qdvhpr9mJINU0Poq2VtDGkT0Vw')
+updater = Updater(token='1603902930:AAGlOzKSomEnXDn_fjMEi2AsZsXNUpOtMXg')
 dispatcher = updater.dispatcher
